@@ -4,6 +4,8 @@ import Logo from "./components/Logo/Logo";
 import Rank from "./components/Rank/Rank";
 import ImageLinkForm from "./components/ImageLinkForm/ImageLinkForm";
 import FaceRecognition from "./components/FaceRecognition/FaceRecognition";
+import SignIn from "./components/SignIn/SignIn";
+import Register from "./components/Register/Register";
 import ParticlesBg from 'particles-bg';
 import Clarifai from 'clarifai';
 import './App.css';
@@ -19,6 +21,8 @@ class App extends Component {
       input: '',
       imageUrl: '',
       boxes: [],
+      route: 'signin',
+      isSignedIn: false
     }
   }
 
@@ -43,7 +47,6 @@ class App extends Component {
   }
 
   displayFaceBox = (boxes) => {
-    console.log(boxes);
     this.setState({boxes: boxes});
   }
 
@@ -52,7 +55,6 @@ class App extends Component {
   }
 
   onButtonSubmit = () => {
-    console.log("click");
     this.setState({imageUrl: this.state.input})
     app.models.predict(
         'face-detection', 
@@ -61,18 +63,38 @@ class App extends Component {
       .catch(err => console.log(err));
   }
 
+  onRouteChange = (route) => {
+    if (route === 'signout') {
+      this.setState({isSignedIn: false});
+    } else if (route === 'home') {
+      this.setState({isSignedIn: true});
+    }
+    this.setState({route: route});
+  }
+
   render() {
+    const { isSignedIn, imageUrl, route, boxes } = this.state;
     return (
       <div className="App">
         <ParticlesBg className="particles-bg-canvas-self" type="circle" />
-        <Navigation />
-        <Logo />
-        <Rank />
-        <ImageLinkForm 
-          onInputChange={this.onInputChange} 
-          onButtonSubmit={this.onButtonSubmit} 
-        />
-        <FaceRecognition boxes={this.state.boxes} imageUrl={this.state.imageUrl} />
+        <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
+        { route === 'home'
+          ? <div>
+              <Logo />
+              <Rank />
+              <ImageLinkForm 
+                onInputChange={this.onInputChange} 
+                onButtonSubmit={this.onButtonSubmit} 
+              />
+              <FaceRecognition boxes={boxes} imageUrl={imageUrl} />
+            </div>
+          : (
+            route === 'register'
+            ? <Register onRouteChange={this.onRouteChange} />
+            : <SignIn onRouteChange={this.onRouteChange} />
+            )
+        }
+        
       </div>
     );
   }
