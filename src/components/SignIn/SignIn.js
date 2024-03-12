@@ -33,7 +33,6 @@ class SignIn extends Component {
         this.props.onRouteChange('home');
       }
     })
-    
   }
 
   render() {
