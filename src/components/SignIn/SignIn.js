@@ -18,13 +18,19 @@ class SignIn extends Component {
   }
 
   onSubmitSignIn = () => {
-    console.log(this.state);
+    const { signInEmail, signInPassword } = this.state;
+
+    if (!signInEmail || !signInPassword) {
+      console.error("Please fill in all fields");
+      return;
+    }
+    
     fetch('http://localhost:3000/signin', {
       method: 'post',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-        email: this.state.signInEmail,
-        password: this.state.signInPassword
+        email: signInEmail,
+        password: signInPassword
       })
     })
     .then(response => response.json())
@@ -32,6 +38,8 @@ class SignIn extends Component {
       if(user.id) {
         this.props.loadUser(user);
         this.props.onRouteChange('home');
+      } else {
+        console.error("Signing in failed");
       }
     })
   }

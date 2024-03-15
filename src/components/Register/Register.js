@@ -23,21 +23,29 @@ class Register extends Component {
   }
 
   onSubmitRegister = () => {
-    console.log(this.state);
+    const { name, email, password } = this.state;
+
+    if (!name || !email || !password) {
+      console.error("Please fill in all fields");
+      return;
+    }
+
     fetch('http://localhost:3000/register', {
       method: 'post',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-        name: this.state.name,
-        email: this.state.email,
-        password: this.state.password
+        name,
+        email,
+        password
       })
     })
     .then(response => response.json())
     .then(user => {
-      if(user) {
+      if(user.id) {
         this.props.loadUser(user);
         this.props.onRouteChange('home');
+      } else {
+        console.error("Registration failed");
       }
     })
   }
