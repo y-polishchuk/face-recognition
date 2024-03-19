@@ -33,8 +33,21 @@ class App extends Component {
     }
   }
 
+  componentDidMount() {
+    fetch('http://localhost:3000/session-status', {credentials: "include"})
+      .then(response => response.json())
+      .then(data => {
+        if (data.user) {
+          this.loadUser(data.user);
+          this.onRouteChange('home');
+        }
+      })
+      .catch(err => console.log(err));
+  }
+
   loadUser = (data) => {
     this.setState({
+      isSignedIn: true,
       user: {
         id: data.id,
         name: data.name,
@@ -46,7 +59,6 @@ class App extends Component {
   }
 
   calculateFaceLocation = (data) => {
-    // const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
     const image = document.getElementById('inputimage');
     const width = Number(image.width);
     const height = Number(image.height);
@@ -100,6 +112,13 @@ class App extends Component {
   onRouteChange = (route) => {
     if (route === 'signout') {
       this.setState({isSignedIn: false});
+      fetch('http://localhost:3000/signout', {
+      method: 'get',
+      headers: {'Content-Type': 'application/json'},
+      credentials: "include"
+    })
+    .then(response => response.json())
+    .then(data => console.log(data.message));
     } else if (route === 'home') {
       this.setState({isSignedIn: true});
     }
@@ -112,7 +131,7 @@ class App extends Component {
       <div className="App">
         <ParticlesBg className="particles-bg-canvas-self" type="circle" />
         <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
-        { route === 'home'
+        { route === 'home' && isSignedIn
           ? <div>
               <Logo />
               <Rank name={this.state.user.name} entries={this.state.user.entries} />

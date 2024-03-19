@@ -33,6 +33,7 @@ class Register extends Component {
     fetch('http://localhost:3000/register', {
       method: 'post',
       headers: {'Content-Type': 'application/json'},
+      credentials: "include",
       body: JSON.stringify({
         name,
         email,

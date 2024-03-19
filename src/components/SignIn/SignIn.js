@@ -28,6 +28,7 @@ class SignIn extends Component {
     fetch('http://localhost:3000/signin', {
       method: 'post',
       headers: {'Content-Type': 'application/json'},
+      credentials: "include",
       body: JSON.stringify({
         email: signInEmail,
         password: signInPassword
