@@ -34,7 +34,12 @@ class App extends Component {
   }
 
   componentDidMount() {
-    fetch('http://localhost:3000/session-status', {credentials: "include"})
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      this.loadUser(JSON.parse(storedUser));
+      this.onRouteChange('home');
+    } else {
+      fetch('http://localhost:3000/session-status', {credentials: "include"})
       .then(response => response.json())
       .then(data => {
         if (data.user) {
@@ -43,6 +48,7 @@ class App extends Component {
         }
       })
       .catch(err => console.log(err));
+    }
   }
 
   loadUser = (data) => {
@@ -56,6 +62,8 @@ class App extends Component {
         joined: data.joined
       }
     })
+
+    localStorage.setItem('user', JSON.stringify(data));
   }
 
   calculateFaceLocation = (data) => {
@@ -102,7 +110,14 @@ class App extends Component {
           })
           .then(response => response.json())
           .then(count => {
-            this.setState(Object.assign(this.state.user, { entries: count }))
+            const storedUser = JSON.parse(localStorage.getItem('user'));
+            const updatedUser = {
+              ...storedUser,
+              entries: count
+            };
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+
+            this.setState(Object.assign(this.state.user, { entries: count }));
           })
         }
         this.displayFaceBox(this.calculateFaceLocation(response));
@@ -112,14 +127,15 @@ class App extends Component {
 
   onRouteChange = (route) => {
     if (route === 'signout') {
-      this.setState({isSignedIn: false});
+      localStorage.removeItem('user');
       fetch('http://localhost:3000/signout', {
-      method: 'get',
-      headers: {'Content-Type': 'application/json'},
-      credentials: "include"
-    })
-    .then(response => response.json())
-    .then(data => console.log(data.message));
+        method: 'get',
+        headers: {'Content-Type': 'application/json'},
+        credentials: "include"
+      })
+      .then(response => response.json())
+      .then(data => console.log(data.message));
+      this.setState({isSignedIn: false});
     } else if (route === 'home') {
       this.setState({isSignedIn: true});
     }
