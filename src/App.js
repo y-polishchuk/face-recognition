@@ -95,6 +95,7 @@ class App extends Component {
           fetch('http://localhost:3000/image', {
             method: 'put',
             headers: {'Content-Type': 'application/json'},
+            credentials: "include",
             body: JSON.stringify({
               id: this.state.user.id
             })
@@ -126,7 +127,7 @@ class App extends Component {
   }
 
   render() {
-    const { isSignedIn, imageUrl, route, boxes } = this.state;
+    const { isSignedIn, imageUrl, route, boxes, user } = this.state;
     return (
       <div className="App">
         <ParticlesBg className="particles-bg-canvas-self" type="circle" />
@@ -134,7 +135,7 @@ class App extends Component {
         { route === 'home' && isSignedIn
           ? <div>
               <Logo />
-              <Rank name={this.state.user.name} entries={this.state.user.entries} />
+              <Rank name={user.name} entries={user.entries} />
               <ImageLinkForm 
                 onInputChange={this.onInputChange} 
                 onButtonSubmit={this.onButtonSubmit} 
