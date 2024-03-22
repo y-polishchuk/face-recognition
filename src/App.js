@@ -7,12 +7,7 @@ import FaceRecognition from "./components/FaceRecognition/FaceRecognition";
 import SignIn from "./components/SignIn/SignIn";
 import Register from "./components/Register/Register";
 import ParticlesBg from 'particles-bg';
-import Clarifai from 'clarifai';
 import './App.css';
-
-const app = new Clarifai.App({
-  apiKey: 'c6ba98ba70ed4bcb8afc8dd1dea6d90d'
- });
 
 const initialState = {
   input: '',
@@ -97,35 +92,42 @@ class App extends Component {
 
   onButtonSubmit = () => {
     this.setState({imageUrl: this.state.input})
-    app.models.predict(
-        'face-detection', 
-        this.state.input
-      ).then(response => {
-        if(response) {
-          fetch('http://localhost:3000/image', {
-            method: 'put',
-            headers: {'Content-Type': 'application/json'},
-            credentials: "include",
-            body: JSON.stringify({
-              id: this.state.user.id
-            })
-          })
-          .then(response => response.json())
-          .then(count => {
-            const storedUser = JSON.parse(localStorage.getItem('user'));
-            const updatedUser = {
-              ...storedUser,
-              entries: count
-            };
-            localStorage.setItem('user', JSON.stringify(updatedUser)); // write down updated user to the local storage
-
-            this.setState(Object.assign(this.state.user, { entries: count }));
-          })
-          .catch(console.log);
-        }
-        this.displayFaceBox(this.calculateFaceLocation(response));
+    
+    fetch('http://localhost:3000/imageurl', {
+      method: 'post',
+      headers: {'Content-Type': 'application/json'},
+      credentials: "include",
+      body: JSON.stringify({
+        input: this.state.input
       })
-      .catch(err => console.log(err));
+    })
+    .then(response => response.json())
+    .then(response => {
+    if(response) {
+      fetch('http://localhost:3000/image', {
+        method: 'put',
+        headers: {'Content-Type': 'application/json'},
+        credentials: "include",
+        body: JSON.stringify({
+          id: this.state.user.id
+        })
+      })
+      .then(response => response.json())
+      .then(count => {
+        const storedUser = JSON.parse(localStorage.getItem('user'));
+        const updatedUser = {
+          ...storedUser,
+          entries: count
+        };
+        localStorage.setItem('user', JSON.stringify(updatedUser)); // write down updated user to the local storage
+
+        this.setState(Object.assign(this.state.user, { entries: count }));
+      })
+      .catch(console.log);
+    }
+    this.displayFaceBox(this.calculateFaceLocation(response));
+  })
+  .catch(err => console.log(err));
   }
 
   onRouteChange = (route) => {

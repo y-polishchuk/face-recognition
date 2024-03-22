@@ -25,11 +25,6 @@ class Register extends Component {
   onSubmitRegister = () => {
     const { name, email, password } = this.state;
 
-    if (!name || !email || !password) {
-      console.error("Please fill in all fields");
-      return;
-    }
-
     fetch('http://localhost:3000/register', {
       method: 'post',
       headers: {'Content-Type': 'application/json'},

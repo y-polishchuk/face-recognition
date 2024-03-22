@@ -19,11 +19,6 @@ class SignIn extends Component {
 
   onSubmitSignIn = () => {
     const { signInEmail, signInPassword } = this.state;
-
-    if (!signInEmail || !signInPassword) {
-      console.error("Please fill in all fields");
-      return;
-    }
     
     fetch('http://localhost:3000/signin', {
       method: 'post',
